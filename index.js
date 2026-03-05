@@ -1,83 +1,88 @@
-let UserData=[
+let products = [
   { id: 1, name: "Laptop", price: 1200, quantity: 5, category: "Electronics" },
-  { id: 2, name: "Shirt", price: 40, quantity: 0, category: "Clothing" }
+  { id: 2, name: "Shirt", price: 40, quantity: 0, category: "Clothing" },
 ];
 
-
-//add product 
-let _id=3;
-function addProduct(name,price,quantity,category){
-    const data={
-        id:_id,name,price,quantity,category
-    }
-    UserData.push(data);
-    console.log("UserData add successful..");
-    _id++;
+let _id = 3;
+//add product
+function addProduct(product) {
+  const newProduct = {
+    id: randomId(),
+    ...product,
+  };
+  products.push(newProduct);
+  console.log("Product added successfully.");
 }
-// addProduct("watch",1500,2,"Electronics");
- 
+addProduct({
+  name: "watch",
+  price: 1500,
+  quantity: 2,
+  category: "Electronics",
+});
 
 // view All Products.
-function viewAllProducts(){
-    console.log(UserData)
+function viewAllProducts() {
+  console.log(products);
 }
-// viewAllProducts();
- 
+viewAllProducts();
 
 // Remove Product
-function removeProduct(_id){
-    UserData=UserData.filter((user)=>user.id!=_id);
-}
-// removeProduct(1)
- 
+function removeProduct(id) {
+  const exists = products.find((product) => product.id === id);
 
-// Update product
-function updateQuantity(id,name,price,quantity,category){
-    UserData=UserData.map((user)=>{
-        if(user.id==id){
-            return {id,name,price,quantity,category}
-        }
-        return user;
-    })
+  if (!exists) {
+    console.log("product not found.");
+    return;
+  }
+
+  products = products.filter((product) => product.id !== id);
+  console.log("Product removed successfully.");
 }
-// updateQuantity(2,"watch",1500,2,"Electronics");
-// viewAllProducts();
- 
+removeProduct(1);
+
+// update quantity
+function updateQuantity(id, quantity) {
+  const index = products.findIndex((product) => product.id === id);
+
+  if (index !== -1) {
+    products[index].quantity += quantity;
+  }
+}
+updateQuantity(2, 10);
+viewAllProducts();
+
 // check total product avilable
-function getInStockProducts(){
-    const Product=UserData.reduce((acc,curr)=>{
-        return acc+=curr.quantity;
-    },0)
-    console.log("Total Product quantity is : ",Product);
+function getInStockProducts() {
+  return products.filter((product) => product.quantity > 0);
 }
 getInStockProducts();
 
 // all product total price
-function getTotalPrice(){
-    const price=UserData.reduce((acc,curr)=>{
-        return acc+=(curr.price*curr.quantity);
-    },0)
-    console.log("Total Price is: ",price);
+function getTotalInventoryValue() {
+  return products.reduce((total, product) => {
+    return total + product.price * product.quantity;
+  }, 0);
 }
-getTotalPrice();
+getTotalInventoryValue();
 
 // Group by product
-function groupByCategory(Category){
-    let category=UserData.filter((user)=>{
-        return user.category==Category;
-    });
-    console.log(category);
+function groupByCategory() {
+  return products.reduce((groups, product) => {
+    if (!groups[product.category]) {
+      groups[product.category] = [];
+    }
+    groups[product.category].push(product);
+    return groups;
+  }, {});
 }
-// groupByCategory("Electronics");
-
+groupByCategory();
 
 // Low product
-function getLowStockProducts(threshold){
-    let avilableStock=UserData.filter((user)=>{
-        if(user.quantity > threshold){
-            return user;
-        }
-    })
-    console.log(avilableStock);  
+function getLowStockProducts(threshold) {
+  return products.filter((product) => product.quantity <= threshold);
 }
-// getLowStockProducts(5);
+getLowStockProducts(3);
+
+function randomId() {
+  return Math.floor(Math.random() * 10000) + 1;
+}
